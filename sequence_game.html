@@ -71,14 +71,111 @@
             font-size: 0.8em;
         }
 
-        .score-display {
+        .multiplayer-debug {
+            background: rgba(255, 193, 7, 0.2);
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+
+        .multiplayer-debug h3 {
+            color: #ffc107;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .debug-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+
+        .debug-info div {
+            background: rgba(0,0,0,0.1);
+            padding: 5px 8px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 0.8em;
+        }
+
+        .player-testing {
             background: rgba(76, 175, 80, 0.2);
             border: 2px solid #4caf50;
-            border-radius: 8px;
-            padding: 10px;
+            border-radius: 10px;
+            padding: 15px;
             margin-bottom: 15px;
             text-align: center;
+        }
+
+        .player-mode-selector {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .mode-btn {
+            padding: 8px 16px;
+            border: 2px solid #4caf50;
+            border-radius: 20px;
+            background: transparent;
             color: #4caf50;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: bold;
+        }
+
+        .mode-btn:active {
+            transform: scale(0.95);
+        }
+
+        .mode-btn.active {
+            background: #4caf50;
+            color: white;
+        }
+
+        .hand-comparison {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .other-players {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .other-player {
+            background: rgba(255,255,255,0.05);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .other-player-cards {
+            display: flex;
+            gap: 3px;
+            justify-content: center;
+            margin-top: 8px;
+        }
+
+        .mini-card {
+            width: 25px;
+            height: 35px;
+            background: white;
+            border: 1px solid #333;
+            border-radius: 3px;
+            font-size: 0.6em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #333;
             font-weight: bold;
         }
 
@@ -287,93 +384,12 @@
             border-radius: 8px;
         }
 
-        .session-info {
-            background: rgba(255,193,7,0.2);
-            border: 2px solid #ffc107;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            font-size: 0.9em;
-        }
-
-        .session-info h3 {
-            color: #ffc107;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-
-        .session-details {
-            display: grid;
-            gap: 5px;
-        }
-
-        .session-details div {
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .players-list {
-            background: rgba(255,255,255,0.1);
-            border-radius: 8px;
-            padding: 10px;
-            margin-bottom: 15px;
-        }
-
-        .players-title {
-            color: #ffd700;
+        .win-message {
+            background: #ffd700;
+            color: #333;
+            font-size: 1.3em;
             font-weight: bold;
-            margin-bottom: 8px;
-            text-align: center;
-        }
-
-        .player-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 5px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .player-item:last-child {
-            border-bottom: none;
-        }
-
-        .player-name {
-            font-weight: bold;
-        }
-
-        .player-me {
-            color: #ffd700;
-        }
-
-        .player-status {
-            font-size: 0.8em;
-            opacity: 0.8;
-        }
-
-        .team-indicator {
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 0.8em;
-            font-weight: bold;
-        }
-
-        .team-0 { background: #4285f4; color: white; }
-        .team-1 { background: #34a853; color: white; }
-        .team-2 { background: #ea4335; color: white; }
-
-        .debug-toggle {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            background: rgba(0,0,0,0.5);
-            color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 15px;
-            cursor: pointer;
-            font-size: 0.8em;
-            z-index: 1000;
+            animation: celebration 2s ease-in-out infinite;
         }
 
         @keyframes celebration {
@@ -410,14 +426,14 @@
             📱 Multiplayer Session | Session: <span id="sessionDisplay">Loading...</span> | Players: <span id="playerCount">0</span>
         </div>
 
-        <div class="session-info" id="sessionInfo" style="display: none;">
+        <div class="multiplayer-debug" id="multiplayerDebug">
             <h3>🔍 Session Debug Info</h3>
-            <div class="session-details">
-                <div><strong>Session ID:</strong> <span id="fullSessionId"></span></div>
-                <div><strong>Your User ID:</strong> <span id="yourUserId"></span></div>
-                <div><strong>Chat ID:</strong> <span id="chatIdDisplay"></span></div>
-                <div><strong>Game Mode:</strong> <span id="gameModeDisplay"></span></div>
-                <div><strong>Sequences Needed:</strong> <span id="sequencesNeeded">2</span></div>
+            <div class="debug-info">
+                <div><strong>Session ID:</strong> <span id="debugSessionId">-</span></div>
+                <div><strong>Your User ID:</strong> <span id="debugUserId">-</span></div>
+                <div><strong>Chat ID:</strong> <span id="debugChatId">-</span></div>
+                <div><strong>Hand Seed:</strong> <span id="debugHandSeed">-</span></div>
+                <div><strong>Players in Session:</strong> <span id="debugPlayerList">-</span></div>
             </div>
         </div>
 
@@ -429,6 +445,23 @@
             <div class="player-info">
                 <span id="deckCount">Cards: 98</span>
             </div>
+        </div>
+
+        <div class="player-testing">
+            <h3>🧪 Testing Mode</h3>
+            <div>Test different player counts:</div>
+            <div class="player-mode-selector">
+                <button class="mode-btn" onclick="setPlayerMode(2)">2 Players</button>
+                <button class="mode-btn" onclick="setPlayerMode(3)">3 Players</button>
+                <button class="mode-btn" onclick="setPlayerMode(4)">4 Players</button>
+                <button class="mode-btn" onclick="setPlayerMode(6)">6 Players</button>
+                <button class="mode-btn active" onclick="toggleDebugMode()">Debug ON</button>
+            </div>
+        </div>
+
+        <div class="hand-comparison" id="handComparison" style="display: none;">
+            <h3>👥 All Players in Session</h3>
+            <div class="other-players" id="allPlayerHands"></div>
         </div>
 
         <div class="score-display" id="scoreDisplay">
@@ -879,24 +912,17 @@
             document.getElementById('sessionDisplay').textContent = 
                 gameState.sessionId.substring(0, 12) + '...';
             
-            document.getElementById('playerCount').textContent = gameState.players.length;
-            
             document.getElementById('currentTurn').textContent = 
-                gameState.gameOver ? 'Game Over' : 'Your Turn';
+                gameState.gameOver ? 'Game Over' : `${gameState.players[gameState.currentPlayerIndex]?.name || 'Player'}'s Turn`;
             
             const deadCardBtn = document.getElementById('deadCardBtn');
             const hasDeadCard = gameState.selectedCard && isDeadCard(gameState.selectedCard);
             deadCardBtn.disabled = !hasDeadCard;
-        }
-
-        function hashCode(str) {
-            let hash = 0;
-            for (let i = 0; i < str.length; i++) {
-                const char = str.charCodeAt(i);
-                hash = ((hash << 5) - hash) + char;
-                hash = hash & hash; // Convert to 32bit integer
+            
+            // Update debug info if enabled
+            if (gameState.debugMode) {
+                updateDebugInfo();
             }
-            return Math.abs(hash);
         }
 
         function updateGameStatus(message) {
