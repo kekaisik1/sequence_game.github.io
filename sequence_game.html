@@ -326,7 +326,7 @@
         </div>
 
         <div class="telegram-indicator">
-            📱 Playing in Telegram | High scores tracked automatically
+            📱 Multiplayer Session | Session: <span id="sessionDisplay">Loading...</span>
         </div>
 
         <div class="game-info">
@@ -783,6 +783,10 @@
         }
 
         function updateUI() {
+            // Update session display
+            document.getElementById('sessionDisplay').textContent = 
+                gameState.sessionId.substring(0, 12) + '...';
+            
             document.getElementById('currentTurn').textContent = 
                 gameState.gameOver ? 'Game Over' : 'Your Turn';
             
