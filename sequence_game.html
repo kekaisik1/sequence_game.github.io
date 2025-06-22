@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎯 Sequence - Telegram Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            min-height: 100vh;
+            padding: 10px;
+            overflow-x: hidden;
+            touch-action: manipulation;
+        }
+
+        .game-container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 10px;
+        }
+
+        .game-header {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .game-title {
+            font-size: 1.8em;
+            color: #ffd700;
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .telegram-indicator {
+            background: rgba(0, 136, 204, 0.2);
+            border: 2px solid #0088cc;
+            border-radius: 8px;
+            padding: 8px;
+            margin-bottom: 15px;
+            text-align: center;
+            color: #0088cc;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+
+        .current-turn {
+            background: #ffd700;
+            color: #333;
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 0.8em;
+        }
+
+        .score-display {
+            background: rgba(76, 175, 80, 0.2);
+            border: 2px solid #4caf50;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 15px;
+            text-align: center;
+            color: #4caf50;
+            font-weight: bold;
+        }
+
+        .board-container {
+            background: rgba(255,255,255,0.95);
+            border-radius: 10px;
+            padding: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+
+        .board {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 2px;
+            max-width: 100%;
+            margin: 0 auto;
+            aspect-ratio: 1;
+        }
+
+        .board-cell {
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #333;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.5em;
+            font-weight: bold;
+            color: #333;
+            background: white;
+            transition: all 0.2s ease;
+            position: relative;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .board-cell:active {
+            transform: scale(0.95);
+        }
+
+        .board-cell.free {
+            background: linear-gradient(45deg, #ffd700, #ffed4e);
+            color: #333;
+            font-weight: bold;
+        }
+
+        .board-cell.occupied {
+            border: 2px solid;
+        }
+
+        .board-cell.team-0 {
+            background: #4285f4;
+            color: white;
+            border-color: #1565c0;
+        }
+
+        .board-cell.team-1 {
+            background: #34a853;
+            color: white;
+            border-color: #2e7d32;
+        }
+
+        .board-cell.team-2 {
+            background: #ea4335;
+            color: white;
+            border-color: #c62828;
+        }
+
+        .board-cell.selectable {
+            animation: pulse 1.5s infinite;
+            border-color: #ffd700 !important;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7); }
+            70% { box-shadow: 0 0 0 3px rgba(255, 215, 0, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); }
+        }
+
+        .suit-spades { color: #000; }
+        .suit-hearts { color: #e74c3c; }
+        .suit-diamonds { color: #e74c3c; }
+        .suit-clubs { color: #000; }
+
+        .player-hand {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .hand-title {
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            text-align: center;
+            color: #ffd700;
+        }
+
+        .hand-cards {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+        }
+
+        .card {
+            width: 45px;
+            height: 65px;
+            background: white;
+            border: 2px solid #333;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: bold;
+            color: #333;
+            position: relative;
+            font-size: 0.8em;
+            user-select: none;
+        }
+
+        .card:active {
+            transform: scale(0.95);
+        }
+
+        .card.selected {
+            border-color: #ffd700;
+            background: #fffde7;
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.5);
+        }
+
+        .card.dead {
+            opacity: 0.5;
+            background: #ffebee;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .btn:active {
+            transform: scale(0.95);
+        }
+
+        .btn-primary {
+            background: #ffd700;
+            color: #333;
+        }
+
+        .btn-secondary {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+
+        .btn-share {
+            background: #0088cc;
+            color: white;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn-draw-available {
+            background: #4caf50 !important;
+            color: white !important;
+            animation: drawPulse 1s ease-in-out infinite;
+        }
+
+        @keyframes drawPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7); }
+            50% { box-shadow: 0 0 0 5px rgba(76, 175, 80, 0); }
+        }
+
+        .game-status {
+            text-align: center;
+            font-size: 1em;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+        }
+
+        .win-message {
+            background: #ffd700;
+            color: #333;
+            font-size: 1.3em;
+            font-weight: bold;
+            animation: celebration 2s ease-in-out infinite;
+        }
+
+        @keyframes celebration {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        /* Mobile optimizations */
+        @media (max-width: 480px) {
+            .board-cell {
+                font-size: 0.4em;
+            }
+            
+            .card {
+                width: 40px;
+                height: 55px;
+                font-size: 0.7em;
+            }
+            
+            .btn {
+                padding: 8px 16px;
+                font-size: 0.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="game-header">
+            <h1 class="game-title">🎯 SEQUENCE</h1>
+        </div>
+
+        <div class="telegram-indicator">
+            📱 Playing in Telegram | High scores tracked automatically
+        </div>
+
+        <div class="game-info">
+            <div class="player-info">
+                <span id="playerCount">2 Players</span>
+            </div>
+            <div class="current-turn" id="currentTurn">Your Turn</div>
+            <div class="player-info">
+                <span id="deckCount">Cards: 98</span>
+            </div>
+        </div>
+
+        <div class="score-display" id="scoreDisplay">
+            🏆 Your Score: <span id="currentScore">0</span> points
+        </div>
+
+        <div class="game-status" id="gameStatus">
+            Select a card from your hand, then tap on the board to place it!
+        </div>
+
+        <div class="board-container">
+            <div class="board" id="gameBoard"></div>
+        </div>
+
+        <div class="actions">
+            <button class="btn btn-primary" onclick="drawCard()" id="drawBtn" disabled>Draw Card</button>
+            <button class="btn btn-secondary" onclick="exchangeDeadCard()" id="deadCardBtn" disabled>Exchange Dead</button>
+            <button class="btn btn-share" onclick="shareScore()" id="shareBtn">Share Score</button>
+        </div>
+
+        <div class="player-hand">
+            <div class="hand-title">Your Hand (<span id="handCount">7</span> cards)</div>
+            <div class="hand-cards" id="handCards"></div>
+        </div>
+    </div>
+
+    <!-- Telegram Games API -->
+    <script src="https://telegram.org/js/games.js"></script>
+
+    <script>
+        // Telegram Games integration
+        let telegramGameProxy = null;
+        let gameParams = {};
+        let currentScore = 0;
+        
+        // Initialize Telegram Games
+        if (typeof TelegramGameProxy !== 'undefined') {
+            telegramGameProxy = TelegramGameProxy;
+            gameParams = telegramGameProxy.initParams || {};
+            console.log('Telegram Game loaded with params:', gameParams);
+        }
+
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('user_id') || gameParams.user_id || 'demo';
+        const chatId = urlParams.get('chat_id') || gameParams.chat_id || 'demo';
+
+        // Game configuration - CORRECT BOARD LAYOUT
+        const BOARD_LAYOUT = [
+            ['FREE', '2♠', '3♠', '4♠', '5♠', '6♠', '7♠', '8♠', '9♠', 'FREE'],
+            ['6♣', '5♣', '4♣', '3♣', '2♣', 'A♥', 'K♥', 'Q♥', '10♥', '10♠'],
+            ['7♣', 'A♠', '2♦', '3♦', '4♦', '5♦', '6♦', '7♦', '9♥', 'Q♠'],
+            ['8♣', 'K♠', '6♣', '5♣', '4♣', '3♣', '2♣', '8♦', '8♥', 'K♠'],
+            ['9♣', 'Q♠', '7♣', '6♥', '5♥', '4♥', 'A♥', '9♦', '7♥', 'A♠'],
+            ['10♣', '10♠', '8♣', '7♥', '2♥', '3♥', 'K♥', '10♦', '6♥', '2♦'],
+            ['Q♣', '9♠', '9♣', '8♥', '9♥', '10♥', 'Q♥', 'Q♦', '5♥', '3♦'],
+            ['K♣', '8♠', '10♣', 'Q♣', 'K♣', 'A♣', 'A♦', 'K♦', '4♥', '4♦'],
+            ['A♣', '7♠', '6♠', '5♠', '4♠', '3♠', '2♠', '2♥', '3♥', '5♦'],
+            ['FREE', 'A♦', 'K♦', 'Q♦', '10♦', '9♦', '8♦', '7♦', '6♦', 'FREE']
+        ];
+
+        // Game state
+        let gameState = {
+            board: [],
+            myHand: [],
+            selectedCard: null,
+            gameOver: false,
+            currentPlayerIndex: 0,
+            sequences: 0,
+            drawTimer: null,
+            drawTimeLeft: 0,
+            canDraw: false
+        };
+
+        // Initialize game
+        function initGame() {
+            createBoard();
+            dealCards();
+            renderGame();
+            updateScore(0);
+            updateGameStatus('Game started! Select a card from your hand.');
+        }
+
+        function createBoard() {
+            gameState.board = [];
+            for (let row = 0; row < 10; row++) {
+                gameState.board[row] = [];
+                for (let col = 0; col < 10; col++) {
+                    gameState.board[row][col] = {
+                        card: BOARD_LAYOUT[row][col],
+                        occupied: false,
+                        team: null,
+                        isFree: BOARD_LAYOUT[row][col] === 'FREE'
+                    };
+                }
+            }
+        }
+
+        function dealCards() {
+            // Demo hand for single player
+            gameState.myHand = ['A♠', 'K♥', 'Q♦', 'J♣', '10♠', '9♥', '8♦'];
+        }
+
+        function renderGame() {
+            renderBoard();
+            renderHand();
+            updateUI();
+        }
+
+        function renderBoard() {
+            const boardElement = document.getElementById('gameBoard');
+            boardElement.innerHTML = '';
+
+            for (let row = 0; row < 10; row++) {
+                for (let col = 0; col < 10; col++) {
+                    const cell = gameState.board[row][col];
+                    const cellElement = document.createElement('div');
+                    cellElement.className = 'board-cell';
+                    cellElement.dataset.row = row;
+                    cellElement.dataset.col = col;
+
+                    if (cell.isFree) {
+                        cellElement.classList.add('free');
+                        cellElement.innerHTML = '<div style="font-size: 0.6em;">FREE</div>';
+                    } else {
+                        const [value, suit] = parseCard(cell.card);
+                        cellElement.innerHTML = `
+                            <div class="card-suit ${getSuitClass(suit)}">${suit}</div>
+                            <div class="card-value">${value}</div>
+                        `;
+                    }
+
+                    if (cell.occupied) {
+                        cellElement.classList.add('occupied', `team-${cell.team}`);
+                    }
+
+                    cellElement.addEventListener('click', () => handleBoardClick(row, col));
+
+                    if (gameState.selectedCard && canPlaceCard(gameState.selectedCard, row, col)) {
+                        cellElement.classList.add('selectable');
+                    }
+
+                    boardElement.appendChild(cellElement);
+                }
+            }
+        }
+
+        function renderHand() {
+            const handElement = document.getElementById('handCards');
+            handElement.innerHTML = '';
+
+            gameState.myHand.forEach((card, index) => {
+                const cardElement = createCardElement(card, index);
+                handElement.appendChild(cardElement);
+            });
+
+            document.getElementById('handCount').textContent = gameState.myHand.length;
+        }
+
+        function createCardElement(card, cardIndex) {
+            const cardElement = document.createElement('div');
+            cardElement.className = 'card';
+            cardElement.dataset.cardIndex = cardIndex;
+            cardElement.dataset.card = card;
+
+            const [value, suit] = parseCard(card);
+            
+            cardElement.innerHTML = `
+                <div class="card-value">${value}</div>
+                <div class="card-suit-symbol ${getSuitClass(suit)}">${suit}</div>
+            `;
+
+            if (isDeadCard(card)) {
+                cardElement.classList.add('dead');
+                cardElement.title = 'Dead card - both positions occupied';
+            }
+
+            cardElement.addEventListener('click', () => handleCardClick(cardIndex, card));
+
+            if (gameState.selectedCard === card) {
+                cardElement.classList.add('selected');
+            }
+
+            return cardElement;
+        }
+
+        function handleCardClick(cardIndex, card) {
+            if (gameState.gameOver) return;
+
+            if (gameState.selectedCard === card) {
+                gameState.selectedCard = null;
+                updateGameStatus('Card deselected. Choose a card to play.');
+            } else {
+                gameState.selectedCard = card;
+                
+                if (isJack(card)) {
+                    const jackType = isOneEyedJack(card) ? 'remove an opponent\'s chip' : 'place a chip anywhere';
+                    updateGameStatus(`Selected ${card} - Tap on the board to ${jackType}`);
+                } else if (isDeadCard(card)) {
+                    updateGameStatus(`Selected dead card ${card} - Use "Exchange Dead" button`);
+                } else {
+                    updateGameStatus(`Selected ${card} - Tap on a matching position on the board`);
+                }
+            }
+
+            renderGame();
+        }
+
+        function handleBoardClick(row, col) {
+            if (gameState.gameOver) return;
+            if (!gameState.selectedCard) {
+                updateGameStatus('Please select a card from your hand first!');
+                return;
+            }
+
+            const cell = gameState.board[row][col];
+            const card = gameState.selectedCard;
+
+            if (isJack(card)) {
+                handleJackPlay(row, col);
+            } else {
+                handleRegularCardPlay(row, col);
+            }
+        }
+
+        function handleJackPlay(row, col) {
+            const cell = gameState.board[row][col];
+            const card = gameState.selectedCard;
+
+            if (isOneEyedJack(card)) {
+                if (cell.occupied && cell.team !== 0 && !cell.isFree) {
+                    cell.occupied = false;
+                    cell.team = null;
+                    playCard();
+                } else {
+                    updateGameStatus('Cannot remove chip from this position!');
+                }
+            } else {
+                if (!cell.occupied) {
+                    cell.occupied = true;
+                    cell.team = 0;
+                    playCard();
+                } else {
+                    updateGameStatus('Position already occupied!');
+                }
+            }
+        }
+
+        function handleRegularCardPlay(row, col) {
+            const cell = gameState.board[row][col];
+            const card = gameState.selectedCard;
+
+            if (cell.card === card && !cell.occupied) {
+                cell.occupied = true;
+                cell.team = 0;
+                playCard();
+            } else if (cell.card !== card) {
+                updateGameStatus('Card doesn\'t match this board position!');
+            } else {
+                updateGameStatus('Position already occupied!');
+            }
+        }
+
+        function playCard() {
+            // Remove card from hand
+            const cardIndex = gameState.myHand.indexOf(gameState.selectedCard);
+            gameState.myHand.splice(cardIndex, 1);
+
+            gameState.selectedCard = null;
+
+            // Add points for playing a card
+            updateScore(currentScore + 10);
+
+            // Check for sequences
+            checkSequences();
+
+            if (gameState.sequences >= 2) {
+                // Player wins!
+                gameState.gameOver = true;
+                const finalScore = currentScore + (gameState.sequences * 100);
+                updateScore(finalScore);
+                updateGameStatus('🎉 You Win! 🎉 Sequences completed!');
+                document.getElementById('gameStatus').classList.add('win-message');
+                
+                // Auto-share score on win
+                setTimeout(() => {
+                    if (telegramGameProxy) {
+                        shareScore();
+                    }
+                }, 2000);
+            } else {
+                // Start 3-second draw timer
+                startDrawTimer();
+            }
+
+            renderGame();
+        }
+
+        function checkSequences() {
+            gameState.sequences = 0;
+            const directions = [[0, 1], [1, 0], [1, 1], [1, -1]];
+
+            for (let row = 0; row < 10; row++) {
+                for (let col = 0; col < 10; col++) {
+                    for (let [dx, dy] of directions) {
+                        if (checkSequenceFromPosition(row, col, dx, dy)) {
+                            gameState.sequences++;
+                        }
+                    }
+                }
+            }
+        }
+
+        function checkSequenceFromPosition(startRow, startCol, dx, dy) {
+            const positions = [];
+            let row = startRow;
+            let col = startCol;
+
+            for (let i = 0; i < 5; i++) {
+                if (row < 0 || row >= 10 || col < 0 || col >= 10) return false;
+                positions.push([row, col]);
+                row += dx;
+                col += dy;
+            }
+
+            let validSequence = true;
+            for (let [r, c] of positions) {
+                const cell = gameState.board[r][c];
+                if (cell.isFree) continue;
+                if (!cell.occupied || cell.team !== 0) {
+                    validSequence = false;
+                    break;
+                }
+            }
+
+            return validSequence;
+        }
+
+        function startDrawTimer() {
+            gameState.canDraw = true;
+            gameState.drawTimeLeft = 3;
+            
+            const drawBtn = document.getElementById('drawBtn');
+            drawBtn.disabled = false;
+            drawBtn.classList.add('btn-draw-available');
+            
+            updateGameStatus(`You have ${gameState.drawTimeLeft} seconds to draw a card!`);
+            
+            gameState.drawTimer = setInterval(() => {
+                gameState.drawTimeLeft--;
+                
+                if (gameState.drawTimeLeft > 0) {
+                    updateGameStatus(`You have ${gameState.drawTimeLeft} seconds to draw a card!`);
+                    drawBtn.textContent = `Draw Card (${gameState.drawTimeLeft}s)`;
+                } else {
+                    clearInterval(gameState.drawTimer);
+                    gameState.canDraw = false;
+                    drawBtn.disabled = true;
+                    drawBtn.classList.remove('btn-draw-available');
+                    drawBtn.textContent = 'Draw Card';
+                    
+                    updateGameStatus("Time's up! Continue playing...");
+                    renderGame();
+                }
+            }, 1000);
+        }
+
+        function drawCard() {
+            if (!gameState.canDraw) {
+                updateGameStatus('You can only draw after playing a card!');
+                return;
+            }
+
+            if (gameState.drawTimer) {
+                clearInterval(gameState.drawTimer);
+                gameState.drawTimer = null;
+            }
+
+            // Simulate drawing a card
+            const newCards = ['7♣', '4♠', '2♥', 'Q♠', 'J♦', '5♦', '3♣'];
+            const newCard = newCards[Math.floor(Math.random() * newCards.length)];
+            gameState.myHand.push(newCard);
+            
+            gameState.canDraw = false;
+            const drawBtn = document.getElementById('drawBtn');
+            drawBtn.disabled = true;
+            drawBtn.classList.remove('btn-draw-available');
+            drawBtn.textContent = 'Draw Card';
+            
+            // Add points for drawing
+            updateScore(currentScore + 5);
+            
+            updateGameStatus("Drew a card! Continue playing...");
+            renderGame();
+        }
+
+        function exchangeDeadCard() {
+            if (!gameState.selectedCard || !isDeadCard(gameState.selectedCard)) {
+                updateGameStatus('Please select a dead card first!');
+                return;
+            }
+
+            const cardIndex = gameState.myHand.indexOf(gameState.selectedCard);
+            gameState.myHand.splice(cardIndex, 1);
+            
+            // Add new random card
+            const newCards = ['7♣', '4♠', '2♥', 'Q♠', 'J♦'];
+            const newCard = newCards[Math.floor(Math.random() * newCards.length)];
+            gameState.myHand.push(newCard);
+
+            gameState.selectedCard = null;
+            updateScore(currentScore + 3);
+            updateGameStatus('Exchanged dead card for a new one!');
+            
+            renderGame();
+        }
+
+        function shareScore() {
+            if (telegramGameProxy && typeof telegramGameProxy.shareScore === 'function') {
+                try {
+                    telegramGameProxy.shareScore();
+                    updateGameStatus('Score shared successfully! 🎉');
+                } catch (error) {
+                    console.error('Error sharing score:', error);
+                    updateGameStatus('Error sharing score. Try again later.');
+                }
+            } else {
+                updateGameStatus('Share feature only works in Telegram!');
+            }
+        }
+
+        function updateScore(newScore) {
+            currentScore = newScore;
+            document.getElementById('currentScore').textContent = currentScore;
+            
+            // Send score to Telegram (this would normally be done via your bot's webhook)
+            if (telegramGameProxy && typeof telegramGameProxy.setScore === 'function') {
+                try {
+                    telegramGameProxy.setScore(currentScore);
+                } catch (error) {
+                    console.error('Error setting score:', error);
+                }
+            }
+        }
+
+        function updateUI() {
+            document.getElementById('currentTurn').textContent = 
+                gameState.gameOver ? 'Game Over' : 'Your Turn';
+            
+            const deadCardBtn = document.getElementById('deadCardBtn');
+            const hasDeadCard = gameState.selectedCard && isDeadCard(gameState.selectedCard);
+            deadCardBtn.disabled = !hasDeadCard;
+        }
+
+        function updateGameStatus(message) {
+            document.getElementById('gameStatus').textContent = message;
+        }
+
+        // Helper functions
+        function parseCard(card) {
+            if (card === 'FREE') return ['FREE', ''];
+            const suit = card.slice(-1);
+            const value = card.slice(0, -1);
+            return [value, suit];
+        }
+
+        function getSuitClass(suit) {
+            const suitClasses = {
+                '♠': 'suit-spades',
+                '♥': 'suit-hearts',
+                '♦': 'suit-diamonds',
+                '♣': 'suit-clubs'
+            };
+            return suitClasses[suit] || '';
+        }
+
+        function isJack(card) {
+            return card.startsWith('J');
+        }
+
+        function isOneEyedJack(card) {
+            return card === 'J♠' || card === 'J♥';
+        }
+
+        function isDeadCard(card) {
+            if (isJack(card)) return false;
+            
+            const positions = findCardPositions(card);
+            return positions.every(([row, col]) => gameState.board[row][col].occupied);
+        }
+
+        function findCardPositions(card) {
+            const positions = [];
+            for (let row = 0; row < 10; row++) {
+                for (let col = 0; col < 10; col++) {
+                    if (gameState.board[row][col].card === card) {
+                        positions.push([row, col]);
+                    }
+                }
+            }
+            return positions;
+        }
+
+        function canPlaceCard(card, row, col) {
+            const cell = gameState.board[row][col];
+            
+            if (isJack(card)) {
+                if (isOneEyedJack(card)) {
+                    return cell.occupied && cell.team !== 0 && !cell.isFree;
+                } else {
+                    return !cell.occupied;
+                }
+            } else {
+                return cell.card === card && !cell.occupied;
+            }
+        }
+
+        // Initialize game when page loads
+        window.addEventListener('DOMContentLoaded', initGame);
+
+        // Console logging for debugging
+        console.log('Sequence Game loaded');
+        console.log('User ID:', userId);
+        console.log('Chat ID:', chatId);
+        console.log('Telegram Game Proxy:', telegramGameProxy ? 'Available' : 'Not available');
+    </script>
+</body>
+</html>
