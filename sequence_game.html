@@ -287,12 +287,93 @@
             border-radius: 8px;
         }
 
-        .win-message {
-            background: #ffd700;
-            color: #333;
-            font-size: 1.3em;
+        .session-info {
+            background: rgba(255,193,7,0.2);
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+
+        .session-info h3 {
+            color: #ffc107;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .session-details {
+            display: grid;
+            gap: 5px;
+        }
+
+        .session-details div {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .players-list {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 15px;
+        }
+
+        .players-title {
+            color: #ffd700;
             font-weight: bold;
-            animation: celebration 2s ease-in-out infinite;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .player-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .player-item:last-child {
+            border-bottom: none;
+        }
+
+        .player-name {
+            font-weight: bold;
+        }
+
+        .player-me {
+            color: #ffd700;
+        }
+
+        .player-status {
+            font-size: 0.8em;
+            opacity: 0.8;
+        }
+
+        .team-indicator {
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .team-0 { background: #4285f4; color: white; }
+        .team-1 { background: #34a853; color: white; }
+        .team-2 { background: #ea4335; color: white; }
+
+        .debug-toggle {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 0.8em;
+            z-index: 1000;
         }
 
         @keyframes celebration {
@@ -326,7 +407,18 @@
         </div>
 
         <div class="telegram-indicator">
-            📱 Multiplayer Session | Session: <span id="sessionDisplay">Loading...</span>
+            📱 Multiplayer Session | Session: <span id="sessionDisplay">Loading...</span> | Players: <span id="playerCount">0</span>
+        </div>
+
+        <div class="session-info" id="sessionInfo" style="display: none;">
+            <h3>🔍 Session Debug Info</h3>
+            <div class="session-details">
+                <div><strong>Session ID:</strong> <span id="fullSessionId"></span></div>
+                <div><strong>Your User ID:</strong> <span id="yourUserId"></span></div>
+                <div><strong>Chat ID:</strong> <span id="chatIdDisplay"></span></div>
+                <div><strong>Game Mode:</strong> <span id="gameModeDisplay"></span></div>
+                <div><strong>Sequences Needed:</strong> <span id="sequencesNeeded">2</span></div>
+            </div>
         </div>
 
         <div class="game-info">
@@ -787,12 +879,24 @@
             document.getElementById('sessionDisplay').textContent = 
                 gameState.sessionId.substring(0, 12) + '...';
             
+            document.getElementById('playerCount').textContent = gameState.players.length;
+            
             document.getElementById('currentTurn').textContent = 
                 gameState.gameOver ? 'Game Over' : 'Your Turn';
             
             const deadCardBtn = document.getElementById('deadCardBtn');
             const hasDeadCard = gameState.selectedCard && isDeadCard(gameState.selectedCard);
             deadCardBtn.disabled = !hasDeadCard;
+        }
+
+        function hashCode(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                const char = str.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash; // Convert to 32bit integer
+            }
+            return Math.abs(hash);
         }
 
         function updateGameStatus(message) {
