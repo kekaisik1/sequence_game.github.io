@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎯 Sequence - Telegram Game</title>
+    <title>🎯 Sequence - Friends Game</title>
     <style>
         * {
             margin: 0;
@@ -39,45 +39,82 @@
             text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
         }
 
-        .multiplayer-info {
-            background: rgba(0, 136, 204, 0.2);
-            border: 2px solid #0088cc;
-            border-radius: 8px;
-            padding: 8px;
+        .friends-mode {
+            background: rgba(76, 175, 80, 0.2);
+            border: 2px solid #4caf50;
+            border-radius: 10px;
+            padding: 15px;
             margin-bottom: 15px;
             text-align: center;
-            color: #0088cc;
-            font-weight: bold;
-            font-size: 0.9em;
+            color: #4caf50;
         }
 
-        .session-info {
+        .session-setup {
             background: rgba(255, 193, 7, 0.2);
             border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+        }
+
+        .session-setup h3 {
+            color: #ffc107;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .session-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        .session-input input {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            min-width: 200px;
+        }
+
+        .session-input button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            background: #4caf50;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .player-name-input {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .player-name-input input {
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            margin: 0 10px;
+        }
+
+        .sync-info {
+            background: rgba(33, 150, 243, 0.2);
+            border: 2px solid #2196f3;
             border-radius: 10px;
             padding: 15px;
             margin-bottom: 15px;
             font-size: 0.9em;
         }
 
-        .session-info h3 {
-            color: #ffc107;
+        .sync-info h3 {
+            color: #2196f3;
             margin-bottom: 10px;
             text-align: center;
-        }
-
-        .session-details {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-
-        .session-details div {
-            background: rgba(0,0,0,0.1);
-            padding: 5px 8px;
-            border-radius: 5px;
-            font-family: monospace;
-            font-size: 0.8em;
         }
 
         .players-list {
@@ -112,26 +149,6 @@
             background: rgba(76, 175, 80, 0.1);
         }
 
-        .game-info {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: rgba(255,255,255,0.1);
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            font-size: 0.9em;
-        }
-
-        .current-turn-indicator {
-            background: #ffd700;
-            color: #333;
-            padding: 6px 12px;
-            border-radius: 15px;
-            font-weight: bold;
-            font-size: 0.8em;
-        }
-
         .waiting-room {
             background: rgba(255, 152, 0, 0.2);
             border: 2px solid #ff9800;
@@ -139,11 +156,6 @@
             padding: 20px;
             margin-bottom: 15px;
             text-align: center;
-        }
-
-        .waiting-room h3 {
-            color: #ff9800;
-            margin-bottom: 15px;
         }
 
         .start-game-btn {
@@ -155,7 +167,7 @@
             font-size: 1em;
             font-weight: bold;
             cursor: pointer;
-            margin-top: 10px;
+            margin: 10px;
         }
 
         .board-container {
@@ -189,41 +201,23 @@
             color: #333;
             background: white;
             transition: all 0.2s ease;
-            position: relative;
-            overflow: hidden;
             user-select: none;
-        }
-
-        .board-cell:active {
-            transform: scale(0.95);
         }
 
         .board-cell.free {
             background: linear-gradient(45deg, #ffd700, #ffed4e);
-            color: #333;
-            font-weight: bold;
         }
 
-        .board-cell.occupied {
-            border: 2px solid;
-        }
-
-        .board-cell.team-0 {
+        .board-cell.occupied.team-0 {
             background: #4285f4;
             color: white;
             border-color: #1565c0;
         }
 
-        .board-cell.team-1 {
+        .board-cell.occupied.team-1 {
             background: #34a853;
             color: white;
             border-color: #2e7d32;
-        }
-
-        .board-cell.team-2 {
-            background: #ea4335;
-            color: white;
-            border-color: #c62828;
         }
 
         .board-cell.selectable {
@@ -249,13 +243,6 @@
             margin-bottom: 15px;
         }
 
-        .hand-title {
-            font-size: 1.1em;
-            margin-bottom: 10px;
-            text-align: center;
-            color: #ffd700;
-        }
-
         .hand-cards {
             display: flex;
             flex-wrap: wrap;
@@ -277,13 +264,8 @@
             transition: all 0.2s ease;
             font-weight: bold;
             color: #333;
-            position: relative;
             font-size: 0.8em;
             user-select: none;
-        }
-
-        .card:active {
-            transform: scale(0.95);
         }
 
         .card.selected {
@@ -291,11 +273,6 @@
             background: #fffde7;
             transform: translateY(-5px);
             box-shadow: 0 5px 15px rgba(255, 215, 0, 0.5);
-        }
-
-        .card.dead {
-            opacity: 0.5;
-            background: #ffebee;
         }
 
         .actions {
@@ -314,11 +291,6 @@
             font-weight: bold;
             cursor: pointer;
             transition: all 0.2s ease;
-            user-select: none;
-        }
-
-        .btn:active {
-            transform: scale(0.95);
         }
 
         .btn-primary {
@@ -335,7 +307,6 @@
         .btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
-            transform: none !important;
         }
 
         .game-status {
@@ -347,146 +318,108 @@
             border-radius: 8px;
         }
 
-        .win-message {
-            background: #ffd700;
-            color: #333;
-            font-size: 1.3em;
-            font-weight: bold;
-            animation: celebration 2s ease-in-out infinite;
-        }
-
-        @keyframes celebration {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-
-        .sync-indicator {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #4caf50;
-            z-index: 1000;
-        }
-
-        .sync-indicator.syncing {
-            background: #ff9800;
-            animation: blink 1s infinite;
-        }
-
-        .sync-indicator.error {
-            background: #f44336;
-        }
-
-        @keyframes blink {
-            0%, 50% { opacity: 1; }
-            51%, 100% { opacity: 0.3; }
+        .shared-storage-note {
+            background: rgba(33, 150, 243, 0.1);
+            border: 1px solid #2196f3;
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 10px;
+            font-size: 0.8em;
+            color: #2196f3;
         }
 
         /* Mobile optimizations */
         @media (max-width: 480px) {
-            .board-cell {
-                font-size: 0.4em;
-            }
-            
-            .card {
-                width: 40px;
-                height: 55px;
-                font-size: 0.7em;
-            }
-            
-            .btn {
-                padding: 8px 16px;
-                font-size: 0.8em;
-            }
+            .board-cell { font-size: 0.4em; }
+            .card { width: 40px; height: 55px; font-size: 0.7em; }
+            .session-input { flex-direction: column; }
+            .session-input input { min-width: auto; }
         }
     </style>
 </head>
 <body>
-    <div class="sync-indicator" id="syncIndicator"></div>
-    
     <div class="game-container">
         <div class="game-header">
             <h1 class="game-title">🎯 SEQUENCE</h1>
         </div>
 
-        <div class="multiplayer-info">
-            📱 Multiplayer Game | Session: <span id="sessionDisplay">Loading...</span>
+        <div class="friends-mode">
+            <strong>🎮 Friends Mode</strong> - Simple multiplayer using browser storage
         </div>
 
-        <div class="session-info" id="sessionInfo">
-            <h3>🔍 Session Info</h3>
-            <div class="session-details">
-                <div><strong>Session:</strong> <span id="debugSessionId">-</span></div>
-                <div><strong>Your ID:</strong> <span id="debugUserId">-</span></div>
-                <div><strong>Players:</strong> <span id="debugPlayerCount">-</span></div>
-                <div><strong>Status:</strong> <span id="debugGameStatus">-</span></div>
+        <!-- Session Setup -->
+        <div class="session-setup" id="sessionSetup">
+            <h3>🏠 Join or Create Session</h3>
+            
+            <div class="player-name-input">
+                <label>Your Name:</label>
+                <input type="text" id="playerNameInput" placeholder="Enter your name" maxlength="20">
+            </div>
+
+            <div class="session-input">
+                <input type="text" id="sessionIdInput" placeholder="Session ID (e.g., 'friends-game-1')" maxlength="30">
+                <button onclick="joinSession()">Join Session</button>
+            </div>
+
+            <div style="text-align: center; margin-top: 15px;">
+                <button class="start-game-btn" onclick="createQuickSession()">Quick Start (Auto Generate)</button>
+            </div>
+
+            <div class="shared-storage-note">
+                💡 <strong>How it works:</strong> All players use the same Session ID to join the same game. 
+                Game state is synchronized using browser storage. Share the Session ID with your friends!
             </div>
         </div>
 
-        <div class="waiting-room" id="waitingRoom" style="display: none;">
-            <h3>⏳ Waiting for Game to Start</h3>
-            <p>Players will be dealt cards when the game begins.</p>
-            <button class="start-game-btn" onclick="requestStartGame()" id="startGameBtn">Start Game</button>
+        <!-- Sync Info -->
+        <div class="sync-info" id="syncInfo" style="display: none;">
+            <h3>📡 Session: <span id="currentSession"></span></h3>
+            <div style="text-align: center;">
+                <div><strong>You:</strong> <span id="yourName"></span></div>
+                <div><strong>Last Update:</strong> <span id="lastSync"></span></div>
+                <button class="btn btn-secondary" onclick="manualSync()" style="margin-top: 10px;">🔄 Sync Now</button>
+            </div>
         </div>
 
-        <div class="players-list" id="playersList">
+        <!-- Players List -->
+        <div class="players-list" id="playersList" style="display: none;">
             <h3>👥 Players in Session</h3>
             <div class="players-grid" id="playersGrid"></div>
         </div>
 
-        <div class="game-info" id="gameInfo" style="display: none;">
-            <div class="player-info">
-                <span id="sequenceCount">Sequences: 0/2</span>
-            </div>
-            <div class="current-turn-indicator" id="currentTurn">Waiting...</div>
-            <div class="player-info">
-                <span id="deckCount">Cards: 104</span>
-            </div>
+        <!-- Waiting Room -->
+        <div class="waiting-room" id="waitingRoom" style="display: none;">
+            <h3>⏳ Waiting for Game to Start</h3>
+            <p>Share the Session ID with your friends: <strong id="shareSessionId"></strong></p>
+            <button class="start-game-btn" onclick="startGame()" id="startGameBtn">Start Game (2+ Players)</button>
+            <button class="btn btn-secondary" onclick="addBotPlayer()">Add Bot Player</button>
         </div>
 
+        <!-- Game Status -->
         <div class="game-status" id="gameStatus">
-            Loading game session...
+            Ready to create or join a session!
         </div>
 
+        <!-- Game Board -->
         <div class="board-container" id="boardContainer" style="display: none;">
             <div class="board" id="gameBoard"></div>
         </div>
 
+        <!-- Actions -->
         <div class="actions" id="gameActions" style="display: none;">
             <button class="btn btn-primary" onclick="playSelectedCard()" id="playBtn" disabled>Play Card</button>
             <button class="btn btn-secondary" onclick="exchangeDeadCard()" id="deadCardBtn" disabled>Exchange Dead</button>
         </div>
 
+        <!-- Player Hand -->
         <div class="player-hand" id="playerHand" style="display: none;">
             <div class="hand-title">Your Hand (<span id="handCount">0</span> cards)</div>
             <div class="hand-cards" id="handCards"></div>
         </div>
     </div>
 
-    <!-- Telegram Games API -->
-    <script src="https://telegram.org/js/games.js"></script>
-
     <script>
-        // Telegram Games integration
-        let telegramGameProxy = null;
-        let gameParams = {};
-        
-        // Initialize Telegram Games
-        if (typeof TelegramGameProxy !== 'undefined') {
-            telegramGameProxy = TelegramGameProxy;
-            gameParams = telegramGameProxy.initParams || {};
-        }
-
-        // Get URL parameters
-        const urlParams = new URLSearchParams(window.location.search);
-        const sessionId = urlParams.get('session_id') || 'demo';
-        const userId = urlParams.get('user_id') || gameParams.user_id || Math.floor(Math.random() * 10000);
-        const chatId = urlParams.get('chat_id') || gameParams.chat_id || 'demo';
-
-        // CORRECT BOARD LAYOUT FOR SEQUENCE
+        // Game configuration
         const BOARD_LAYOUT = [
             ['FREE', '2♠', '3♠', '4♠', '5♠', '6♠', '7♠', '8♠', '9♠', 'FREE'],
             ['6♣', '5♣', '4♣', '3♣', '2♣', 'A♥', 'K♥', 'Q♥', '10♥', '10♠'],
@@ -502,63 +435,58 @@
 
         // Global game state
         let gameState = {
-            sessionId: sessionId,
-            userId: userId,
-            chatId: chatId,
-            players: [],
-            myPlayerIndex: -1,
-            gameStarted: false,
-            currentPlayerIndex: 0,
-            board: [],
-            myHand: [],
+            sessionId: null,
+            playerId: null,
+            playerName: null,
             selectedCard: null,
-            sequences: 0,
-            gameOver: false,
-            lastSync: 0
+            connected: false
         };
 
-        // Simulated multiplayer state stored in memory
-        let multiplayerState = {};
+        // Shared game data (stored in localStorage)
+        let sharedGameData = {
+            sessionId: null,
+            players: [],
+            gameStarted: false,
+            currentPlayerIndex: 0,
+            deck: [],
+            board: [],
+            hands: {},
+            gameOver: false,
+            winner: null,
+            lastUpdate: Date.now()
+        };
 
-        // Initialize game
-        function initGame() {
-            updateDebugInfo();
-            
-            // Initialize multiplayer session
-            if (!multiplayerState[sessionId]) {
-                createMultiplayerSession();
-            }
-            
-            // Add this player to session
-            addPlayerToSession();
-            
-            // Create board
-            createBoard();
-            
-            // Start sync loop
-            setInterval(syncGameState, 1000);
-            
-            // Initial render
-            renderGame();
-            
-            console.log('Game initialized for session:', sessionId);
+        // Generate a unique player ID
+        function generatePlayerId() {
+            return 'player_' + Math.random().toString(36).substr(2, 9);
         }
 
-        function createMultiplayerSession() {
-            multiplayerState[sessionId] = {
-                players: [],
-                gameStarted: false,
-                currentPlayerIndex: 0,
-                board: [],
-                deck: createShuffledDeck(),
-                hands: {},
-                sequences: {},
-                gameOver: false,
-                winner: null,
-                createdAt: Date.now()
-            };
+        // Create a proper deck
+        function createDeck() {
+            const suits = ['♠', '♥', '♦', '♣'];
+            const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+            const deck = [];
             
-            // Initialize board
+            // Create exactly 2 of each card (104 total)
+            for (let i = 0; i < 2; i++) {
+                for (const suit of suits) {
+                    for (const value of values) {
+                        deck.push(`${value}${suit}`);
+                    }
+                }
+            }
+            
+            // Shuffle deck
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+            
+            return deck;
+        }
+
+        // Create initial board
+        function createBoard() {
             const board = [];
             for (let row = 0; row < 10; row++) {
                 board[row] = [];
@@ -571,232 +499,236 @@
                     };
                 }
             }
-            multiplayerState[sessionId].board = board;
-            
-            console.log('Created new multiplayer session:', sessionId);
+            return board;
         }
 
-        function createShuffledDeck() {
-            const suits = ['♠', '♥', '♦', '♣'];
-            const values = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
-            
-            const deck = [];
-            // Create exactly 2 of each card (104 cards total) - proper Sequence deck
-            for (let i = 0; i < 2; i++) {
-                for (const suit of suits) {
-                    for (const value of values) {
-                        deck.push(`${value}${suit}`);
-                    }
-                }
-            }
-            
-            // Shuffle the deck
-            for (let i = deck.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [deck[i], deck[j]] = [deck[j], deck[i]];
-            }
-            
-            return deck;
+        // Save shared game data to localStorage
+        function saveSharedData() {
+            sharedGameData.lastUpdate = Date.now();
+            localStorage.setItem(`sequence_game_${sharedGameData.sessionId}`, JSON.stringify(sharedGameData));
+            console.log('Game data saved:', sharedGameData.sessionId);
         }
 
-        function addPlayerToSession() {
-            const session = multiplayerState[sessionId];
-            
-            // Check if player already exists
-            const existingPlayerIndex = session.players.findIndex(p => p.id === userId);
-            if (existingPlayerIndex !== -1) {
-                gameState.myPlayerIndex = existingPlayerIndex;
-                console.log('Player reconnected to session');
+        // Load shared game data from localStorage
+        function loadSharedData(sessionId) {
+            const data = localStorage.getItem(`sequence_game_${sessionId}`);
+            if (data) {
+                sharedGameData = JSON.parse(data);
+                console.log('Game data loaded:', sessionId);
+                return true;
+            }
+            return false;
+        }
+
+        // Create quick session
+        function createQuickSession() {
+            const sessionId = 'friends-' + Math.random().toString(36).substr(2, 6);
+            document.getElementById('sessionIdInput').value = sessionId;
+            joinSession();
+        }
+
+        // Join session
+        function joinSession() {
+            const sessionId = document.getElementById('sessionIdInput').value.trim();
+            const playerName = document.getElementById('playerNameInput').value.trim();
+
+            if (!sessionId || !playerName) {
+                updateGameStatus('Please enter both Session ID and your name!');
                 return;
             }
+
+            gameState.sessionId = sessionId;
+            gameState.playerId = generatePlayerId();
+            gameState.playerName = playerName;
+
+            // Try to load existing session
+            if (!loadSharedData(sessionId)) {
+                // Create new session
+                sharedGameData = {
+                    sessionId: sessionId,
+                    players: [],
+                    gameStarted: false,
+                    currentPlayerIndex: 0,
+                    deck: createDeck(),
+                    board: createBoard(),
+                    hands: {},
+                    gameOver: false,
+                    winner: null,
+                    lastUpdate: Date.now()
+                };
+            }
+
+            // Add player if not exists
+            const existingPlayer = sharedGameData.players.find(p => p.name === playerName);
+            if (!existingPlayer) {
+                sharedGameData.players.push({
+                    id: gameState.playerId,
+                    name: playerName,
+                    team: sharedGameData.players.length % 2,
+                    joinedAt: Date.now()
+                });
+                saveSharedData();
+            } else {
+                gameState.playerId = existingPlayer.id;
+            }
+
+            gameState.connected = true;
             
-            // Add new player
-            const playerNumber = session.players.length + 1;
-            const newPlayer = {
-                id: userId,
-                name: `Player ${playerNumber}`,
-                team: Math.floor(session.players.length / 2), // Simple team assignment
-                joinedAt: Date.now()
-            };
+            // Hide setup, show game
+            document.getElementById('sessionSetup').style.display = 'none';
+            document.getElementById('syncInfo').style.display = 'block';
+            document.getElementById('playersList').style.display = 'block';
             
-            session.players.push(newPlayer);
-            gameState.myPlayerIndex = session.players.length - 1;
+            if (!sharedGameData.gameStarted) {
+                document.getElementById('waitingRoom').style.display = 'block';
+            }
+
+            updateUI();
+            startSyncLoop();
             
-            // Initialize sequences counter
-            session.sequences[userId] = 0;
-            
-            console.log('Player added to session:', newPlayer);
+            updateGameStatus(`Joined session: ${sessionId}`);
         }
 
-        function startMultiplayerGame() {
-            const session = multiplayerState[sessionId];
+        // Add bot player
+        function addBotPlayer() {
+            const botNames = ['Alice Bot', 'Bob Bot', 'Charlie Bot', 'Dana Bot'];
+            const availableBots = botNames.filter(name => 
+                !sharedGameData.players.find(p => p.name === name)
+            );
             
-            if (session.gameStarted) {
-                updateGameStatus('Game already started!');
-                return false;
+            if (availableBots.length > 0 && sharedGameData.players.length < 6) {
+                const botName = availableBots[0];
+                sharedGameData.players.push({
+                    id: 'bot_' + Math.random().toString(36).substr(2, 6),
+                    name: botName,
+                    team: sharedGameData.players.length % 2,
+                    isBot: true,
+                    joinedAt: Date.now()
+                });
+                saveSharedData();
+                updateUI();
+                updateGameStatus(`${botName} joined the game!`);
             }
-            
-            if (session.players.length < 2) {
+        }
+
+        // Start game
+        function startGame() {
+            if (sharedGameData.players.length < 2) {
                 updateGameStatus('Need at least 2 players to start!');
-                return false;
+                return;
             }
+
+            // Deal cards
+            const cardsPerPlayer = {2: 7, 3: 6, 4: 6, 5: 5, 6: 5}[sharedGameData.players.length] || 5;
             
-            // Deal cards to all players
-            const cardsPerPlayer = getCardsPerPlayer(session.players.length);
-            
-            for (const player of session.players) {
+            sharedGameData.hands = {};
+            for (const player of sharedGameData.players) {
                 const hand = [];
                 for (let i = 0; i < cardsPerPlayer; i++) {
-                    if (session.deck.length > 0) {
-                        hand.push(session.deck.pop());
+                    if (sharedGameData.deck.length > 0) {
+                        hand.push(sharedGameData.deck.pop());
                     }
                 }
-                session.hands[player.id] = hand;
+                sharedGameData.hands[player.id] = hand;
             }
+
+            sharedGameData.gameStarted = true;
+            sharedGameData.currentPlayerIndex = 0;
             
-            session.gameStarted = true;
-            session.currentPlayerIndex = 0;
-            
-            console.log('Multiplayer game started with', session.players.length, 'players');
-            return true;
+            saveSharedData();
+            updateUI();
+            updateGameStatus('Game started! Cards have been dealt.');
         }
 
-        function getCardsPerPlayer(playerCount) {
-            const cardDistribution = {
-                2: 7, 3: 6, 4: 6, 5: 5, 6: 5
-            };
-            return cardDistribution[playerCount] || 5;
-        }
-
-        function syncGameState() {
-            const session = multiplayerState[sessionId];
-            if (!session) return;
-            
-            // Update local game state from multiplayer session
-            gameState.players = session.players;
-            gameState.gameStarted = session.gameStarted;
-            gameState.currentPlayerIndex = session.currentPlayerIndex;
-            gameState.board = session.board;
-            gameState.myHand = session.hands[userId] || [];
-            gameState.gameOver = session.gameOver;
-            gameState.lastSync = Date.now();
-            
-            // Update UI
-            renderGame();
-            updateSyncIndicator(true);
-        }
-
-        function createBoard() {
-            gameState.board = [];
-            for (let row = 0; row < 10; row++) {
-                gameState.board[row] = [];
-                for (let col = 0; col < 10; col++) {
-                    gameState.board[row][col] = {
-                        card: BOARD_LAYOUT[row][col],
-                        occupied: false,
-                        team: null,
-                        isFree: BOARD_LAYOUT[row][col] === 'FREE'
-                    };
+        // Sync loop
+        function startSyncLoop() {
+            setInterval(() => {
+                if (gameState.connected && gameState.sessionId) {
+                    const currentData = localStorage.getItem(`sequence_game_${gameState.sessionId}`);
+                    if (currentData) {
+                        const parsedData = JSON.parse(currentData);
+                        if (parsedData.lastUpdate > sharedGameData.lastUpdate) {
+                            sharedGameData = parsedData;
+                            updateUI();
+                            document.getElementById('lastSync').textContent = new Date().toLocaleTimeString();
+                        }
+                    }
                 }
+            }, 2000);
+        }
+
+        // Manual sync
+        function manualSync() {
+            if (gameState.sessionId) {
+                loadSharedData(gameState.sessionId);
+                updateUI();
+                updateGameStatus('Game state synchronized!');
             }
         }
 
-        function renderGame() {
-            renderSessionInfo();
-            renderPlayersList();
-            renderGameInterface();
-            updateDebugInfo();
+        // Update UI
+        function updateUI() {
+            if (!gameState.connected) return;
+
+            document.getElementById('currentSession').textContent = gameState.sessionId;
+            document.getElementById('yourName').textContent = gameState.playerName;
+            document.getElementById('shareSessionId').textContent = gameState.sessionId;
+
+            updatePlayersList();
+            
+            if (sharedGameData.gameStarted) {
+                document.getElementById('waitingRoom').style.display = 'none';
+                document.getElementById('boardContainer').style.display = 'block';
+                document.getElementById('gameActions').style.display = 'flex';
+                document.getElementById('playerHand').style.display = 'block';
+                
+                renderBoard();
+                renderHand();
+                updateTurnStatus();
+            } else {
+                const startBtn = document.getElementById('startGameBtn');
+                startBtn.disabled = sharedGameData.players.length < 2;
+            }
         }
 
-        function renderSessionInfo() {
-            const session = multiplayerState[sessionId];
-            if (!session) return;
-            
-            document.getElementById('sessionDisplay').textContent = sessionId.substring(0, 12) + '...';
-            document.getElementById('debugSessionId').textContent = sessionId.substring(0, 20) + '...';
-            document.getElementById('debugUserId').textContent = userId;
-            document.getElementById('debugPlayerCount').textContent = session.players.length;
-            document.getElementById('debugGameStatus').textContent = session.gameStarted ? 'Playing' : 'Waiting';
-        }
-
-        function renderPlayersList() {
-            const session = multiplayerState[sessionId];
-            if (!session) return;
-            
+        // Update players list
+        function updatePlayersList() {
             const playersGrid = document.getElementById('playersGrid');
             playersGrid.innerHTML = '';
             
-            session.players.forEach((player, index) => {
+            sharedGameData.players.forEach((player, index) => {
                 const playerCard = document.createElement('div');
                 playerCard.className = 'player-card';
                 
-                if (player.id === userId) {
+                if (player.id === gameState.playerId) {
                     playerCard.classList.add('is-you');
                 }
                 
-                if (session.gameStarted && index === session.currentPlayerIndex) {
+                if (sharedGameData.gameStarted && index === sharedGameData.currentPlayerIndex) {
                     playerCard.classList.add('current-turn');
                 }
                 
-                const handSize = session.hands[player.id] ? session.hands[player.id].length : 0;
-                const sequences = session.sequences[player.id] || 0;
+                const handSize = sharedGameData.hands[player.id] ? sharedGameData.hands[player.id].length : 0;
                 
                 playerCard.innerHTML = `
                     <div><strong>${player.name}</strong></div>
-                    <div>${player.id === userId ? '(You)' : ''}</div>
+                    <div>${player.id === gameState.playerId ? '(You)' : player.isBot ? '(Bot)' : ''}</div>
                     <div>Team ${player.team + 1}</div>
                     <div>Cards: ${handSize}</div>
-                    <div>Sequences: ${sequences}</div>
                 `;
                 
                 playersGrid.appendChild(playerCard);
             });
         }
 
-        function renderGameInterface() {
-            const session = multiplayerState[sessionId];
-            if (!session) return;
-            
-            const waitingRoom = document.getElementById('waitingRoom');
-            const gameInfo = document.getElementById('gameInfo');
-            const boardContainer = document.getElementById('boardContainer');
-            const gameActions = document.getElementById('gameActions');
-            const playerHand = document.getElementById('playerHand');
-            
-            if (!session.gameStarted) {
-                // Show waiting room
-                waitingRoom.style.display = 'block';
-                gameInfo.style.display = 'none';
-                boardContainer.style.display = 'none';
-                gameActions.style.display = 'none';
-                playerHand.style.display = 'none';
-                
-                // Only first player can start the game
-                const startBtn = document.getElementById('startGameBtn');
-                startBtn.disabled = session.players[0].id !== userId || session.players.length < 2;
-                
-                updateGameStatus(`Waiting for ${Math.max(2 - session.players.length, 0)} more players...`);
-            } else {
-                // Show game interface
-                waitingRoom.style.display = 'none';
-                gameInfo.style.display = 'flex';
-                boardContainer.style.display = 'block';
-                gameActions.style.display = 'flex';
-                playerHand.style.display = 'block';
-                
-                renderBoard();
-                renderHand();
-                updateGameInfo();
-            }
-        }
-
+        // Render board
         function renderBoard() {
             const boardElement = document.getElementById('gameBoard');
             boardElement.innerHTML = '';
 
             for (let row = 0; row < 10; row++) {
                 for (let col = 0; col < 10; col++) {
-                    const cell = gameState.board[row][col];
+                    const cell = sharedGameData.board[row][col];
                     const cellElement = document.createElement('div');
                     cellElement.className = 'board-cell';
                     cellElement.dataset.row = row;
@@ -828,22 +760,24 @@
             }
         }
 
+        // Render hand
         function renderHand() {
+            const myHand = sharedGameData.hands[gameState.playerId] || [];
             const handElement = document.getElementById('handCards');
             handElement.innerHTML = '';
 
-            gameState.myHand.forEach((card, index) => {
-                const cardElement = createCardElement(card, index);
+            myHand.forEach((card, index) => {
+                const cardElement = createCardElement(card);
                 handElement.appendChild(cardElement);
             });
 
-            document.getElementById('handCount').textContent = gameState.myHand.length;
+            document.getElementById('handCount').textContent = myHand.length;
         }
 
-        function createCardElement(card, cardIndex) {
+        // Create card element
+        function createCardElement(card) {
             const cardElement = document.createElement('div');
             cardElement.className = 'card';
-            cardElement.dataset.cardIndex = cardIndex;
             cardElement.dataset.card = card;
 
             const [value, suit] = parseCard(card);
@@ -853,12 +787,7 @@
                 <div class="card-suit-symbol ${getSuitClass(suit)}">${suit}</div>
             `;
 
-            if (isDeadCard(card)) {
-                cardElement.classList.add('dead');
-                cardElement.title = 'Dead card - both positions occupied';
-            }
-
-            cardElement.addEventListener('click', () => handleCardClick(cardIndex, card));
+            cardElement.addEventListener('click', () => handleCardClick(card));
 
             if (gameState.selectedCard === card) {
                 cardElement.classList.add('selected');
@@ -867,8 +796,8 @@
             return cardElement;
         }
 
-        function handleCardClick(cardIndex, card) {
-            if (gameState.gameOver) return;
+        // Handle card click
+        function handleCardClick(card) {
             if (!isMyTurn()) {
                 updateGameStatus('Not your turn!');
                 return;
@@ -876,223 +805,112 @@
 
             if (gameState.selectedCard === card) {
                 gameState.selectedCard = null;
-                updateGameStatus('Card deselected. Choose a card to play.');
                 document.getElementById('playBtn').disabled = true;
             } else {
                 gameState.selectedCard = card;
                 document.getElementById('playBtn').disabled = false;
-                
-                if (isJack(card)) {
-                    const jackType = isOneEyedJack(card) ? 'remove an opponent\'s chip' : 'place a chip anywhere';
-                    updateGameStatus(`Selected ${card} - Tap on the board to ${jackType}`);
-                } else if (isDeadCard(card)) {
-                    updateGameStatus(`Selected dead card ${card} - Use "Exchange Dead" button`);
-                    document.getElementById('deadCardBtn').disabled = false;
-                } else {
-                    updateGameStatus(`Selected ${card} - Tap on a matching position on the board`);
-                }
+                updateGameStatus(`Selected ${card} - Click on the board to place it`);
             }
 
-            renderGame();
+            renderHand();
         }
 
+        // Handle board click
         function handleBoardClick(row, col) {
-            if (gameState.gameOver) return;
-            if (!isMyTurn()) {
-                updateGameStatus('Not your turn!');
-                return;
-            }
-            if (!gameState.selectedCard) {
-                updateGameStatus('Please select a card from your hand first!');
+            if (!isMyTurn() || !gameState.selectedCard) {
                 return;
             }
 
-            const cell = gameState.board[row][col];
-            const card = gameState.selectedCard;
-
-            if (isJack(card)) {
-                handleJackPlay(row, col);
+            if (canPlaceCard(gameState.selectedCard, row, col)) {
+                playCard(gameState.selectedCard, row, col);
             } else {
-                handleRegularCardPlay(row, col);
+                updateGameStatus('Invalid move!');
             }
         }
 
-        function handleJackPlay(row, col) {
-            const cell = gameState.board[row][col];
-            const card = gameState.selectedCard;
+        // Play card
+        function playCard(card, row, col) {
+            const myPlayer = sharedGameData.players.find(p => p.id === gameState.playerId);
+            const cell = sharedGameData.board[row][col];
 
-            if (isOneEyedJack(card)) {
-                if (cell.occupied && cell.team !== gameState.players[gameState.myPlayerIndex].team && !cell.isFree) {
-                    playCardOnBoard(row, col);
-                } else {
-                    updateGameStatus('Cannot remove chip from this position!');
-                }
-            } else {
-                if (!cell.occupied) {
-                    playCardOnBoard(row, col);
-                } else {
-                    updateGameStatus('Position already occupied!');
-                }
-            }
-        }
-
-        function handleRegularCardPlay(row, col) {
-            const cell = gameState.board[row][col];
-            const card = gameState.selectedCard;
-
-            if (cell.card === card && !cell.occupied) {
-                playCardOnBoard(row, col);
-            } else if (cell.card !== card) {
-                updateGameStatus('Card doesn\'t match this board position!');
-            } else {
-                updateGameStatus('Position already occupied!');
-            }
-        }
-
-        function playCardOnBoard(row, col) {
-            const session = multiplayerState[sessionId];
-            const cell = session.board[row][col];
-            const card = gameState.selectedCard;
-            const myTeam = gameState.players[gameState.myPlayerIndex].team;
-
+            // Execute move
             if (isJack(card)) {
                 if (isOneEyedJack(card)) {
-                    // Remove opponent's chip
                     cell.occupied = false;
                     cell.team = null;
                 } else {
-                    // Place chip anywhere
                     cell.occupied = true;
-                    cell.team = myTeam;
+                    cell.team = myPlayer.team;
                 }
             } else {
-                // Regular card play
                 cell.occupied = true;
-                cell.team = myTeam;
+                cell.team = myPlayer.team;
             }
 
-            // Remove card from hand
-            const cardIndex = session.hands[userId].indexOf(card);
-            session.hands[userId].splice(cardIndex, 1);
+            // Remove card from hand and draw new one
+            const myHand = sharedGameData.hands[gameState.playerId];
+            const cardIndex = myHand.indexOf(card);
+            myHand.splice(cardIndex, 1);
 
-            // Draw new card if deck has cards
-            if (session.deck.length > 0) {
-                session.hands[userId].push(session.deck.pop());
+            // Draw new card if available
+            if (sharedGameData.deck.length > 0) {
+                myHand.push(sharedGameData.deck.pop());
             }
 
             gameState.selectedCard = null;
             document.getElementById('playBtn').disabled = true;
-            document.getElementById('deadCardBtn').disabled = true;
 
-            // Check for sequences
+            // Check for sequences and win
             checkSequences();
 
             // Next player's turn
-            session.currentPlayerIndex = (session.currentPlayerIndex + 1) % session.players.length;
+            sharedGameData.currentPlayerIndex = (sharedGameData.currentPlayerIndex + 1) % sharedGameData.players.length;
 
-            updateGameStatus('Card played! Checking for sequences...');
+            saveSharedData();
+            updateUI();
+            updateGameStatus(`Played ${card} at (${row}, ${col})`);
+
+            // Bot turn if next player is bot
             setTimeout(() => {
-                if (!gameState.gameOver) {
-                    const currentPlayer = session.players[session.currentPlayerIndex];
-                    if (currentPlayer.id === userId) {
-                        updateGameStatus('Your turn! Select a card to play.');
-                    } else {
-                        updateGameStatus(`${currentPlayer.name}'s turn`);
-                    }
+                if (isCurrentPlayerBot()) {
+                    playBotTurn();
                 }
             }, 1500);
         }
 
-        function playSelectedCard() {
-            if (!gameState.selectedCard) {
-                updateGameStatus('Please select a card first!');
-                return;
-            }
-            
-            updateGameStatus('Selected card. Now click on the board to place it!');
-        }
-
-        function exchangeDeadCard() {
-            const session = multiplayerState[sessionId];
-            
-            if (!gameState.selectedCard || !isDeadCard(gameState.selectedCard)) {
-                updateGameStatus('Please select a dead card first!');
-                return;
-            }
-
-            if (!isMyTurn()) {
-                updateGameStatus('Not your turn!');
-                return;
-            }
-
-            const cardIndex = session.hands[userId].indexOf(gameState.selectedCard);
-            session.hands[userId].splice(cardIndex, 1);
-            
-            // Draw new card if available
-            if (session.deck.length > 0) {
-                session.hands[userId].push(session.deck.pop());
-            }
-
-            gameState.selectedCard = null;
-            document.getElementById('deadCardBtn').disabled = true;
-            document.getElementById('playBtn').disabled = true;
-
-            // Next player's turn
-            session.currentPlayerIndex = (session.currentPlayerIndex + 1) % session.players.length;
-
-            updateGameStatus('Dead card exchanged!');
-        }
-
+        // Check sequences
         function checkSequences() {
-            const session = multiplayerState[sessionId];
             const directions = [[0, 1], [1, 0], [1, 1], [1, -1]];
-            
-            // Reset sequence counts
-            for (const player of session.players) {
-                session.sequences[player.id] = 0;
-            }
+            let sequenceCount = { 0: 0, 1: 0 };
 
-            // Check for sequences
             for (let row = 0; row < 10; row++) {
                 for (let col = 0; col < 10; col++) {
                     for (let [dx, dy] of directions) {
-                        const sequenceTeam = checkSequenceFromPosition(row, col, dx, dy);
-                        if (sequenceTeam !== null) {
-                            // Add sequence to all players in this team
-                            for (const player of session.players) {
-                                if (player.team === sequenceTeam) {
-                                    session.sequences[player.id]++;
-                                }
-                            }
+                        const team = checkSequenceFromPosition(row, col, dx, dy);
+                        if (team !== null) {
+                            sequenceCount[team]++;
                         }
                     }
                 }
             }
 
-            // Check for winner (2 sequences needed)
-            for (const player of session.players) {
-                if (session.sequences[player.id] >= 2) {
-                    session.gameOver = true;
-                    session.winner = player.id;
-                    
-                    if (player.id === userId) {
-                        updateGameStatus('🎉 You Win! 🎉 You completed 2 sequences!');
-                        document.getElementById('gameStatus').classList.add('win-message');
-                    } else {
-                        updateGameStatus(`🎉 ${player.name} Wins! 🎉 Game Over!`);
-                    }
+            // Check for winner
+            for (let team in sequenceCount) {
+                if (sequenceCount[team] >= 2) {
+                    sharedGameData.gameOver = true;
+                    const winner = sharedGameData.players.find(p => p.team == team);
+                    sharedGameData.winner = winner?.name || `Team ${parseInt(team) + 1}`;
+                    updateGameStatus(`🎉 ${sharedGameData.winner} Wins! 🎉`);
                     break;
                 }
             }
         }
 
+        // Check sequence from position
         function checkSequenceFromPosition(startRow, startCol, dx, dy) {
-            const session = multiplayerState[sessionId];
             const positions = [];
-            let row = startRow;
-            let col = startCol;
+            let row = startRow, col = startCol;
 
-            // Collect 5 positions
             for (let i = 0; i < 5; i++) {
                 if (row < 0 || row >= 10 || col < 0 || col >= 10) return null;
                 positions.push([row, col]);
@@ -1100,11 +918,10 @@
                 col += dy;
             }
 
-            // Check if all positions belong to same team
             let team = null;
             for (let [r, c] of positions) {
-                const cell = session.board[r][c];
-                if (cell.isFree) continue; // Free corners can be used by any team
+                const cell = sharedGameData.board[r][c];
+                if (cell.isFree) continue;
                 if (!cell.occupied) return null;
                 if (team === null) {
                     team = cell.team;
@@ -1116,59 +933,143 @@
             return team;
         }
 
-        function requestStartGame() {
-            if (startMultiplayerGame()) {
-                updateGameStatus('Game started! Cards dealt to all players.');
+        // Exchange dead card
+        function exchangeDeadCard() {
+            if (!gameState.selectedCard || !isMyTurn()) {
+                return;
             }
+
+            const myHand = sharedGameData.hands[gameState.playerId];
+            const cardIndex = myHand.indexOf(gameState.selectedCard);
+            myHand.splice(cardIndex, 1);
+
+            if (sharedGameData.deck.length > 0) {
+                myHand.push(sharedGameData.deck.pop());
+            }
+
+            gameState.selectedCard = null;
+            document.getElementById('playBtn').disabled = true;
+            document.getElementById('deadCardBtn').disabled = true;
+
+            // Next turn
+            sharedGameData.currentPlayerIndex = (sharedGameData.currentPlayerIndex + 1) % sharedGameData.players.length;
+
+            saveSharedData();
+            updateUI();
+            updateGameStatus('Dead card exchanged!');
         }
 
-        function updateGameInfo() {
-            const session = multiplayerState[sessionId];
-            if (!session) return;
+        // Play selected card (button click)
+        function playSelectedCard() {
+            if (!gameState.selectedCard) {
+                updateGameStatus('Please select a card first!');
+                return;
+            }
+            updateGameStatus('Card selected. Now click on the board to place it!');
+        }
+
+        // Bot AI
+        function playBotTurn() {
+            if (!isCurrentPlayerBot() || sharedGameData.gameOver) return;
+
+            const currentPlayer = sharedGameData.players[sharedGameData.currentPlayerIndex];
+            const botHand = sharedGameData.hands[currentPlayer.id];
             
-            const mySequences = session.sequences[userId] || 0;
-            document.getElementById('sequenceCount').textContent = `Sequences: ${mySequences}/2`;
-            document.getElementById('deckCount').textContent = `Cards: ${session.deck.length}`;
-            
-            const currentPlayer = session.players[session.currentPlayerIndex];
-            if (currentPlayer) {
-                if (currentPlayer.id === userId) {
-                    document.getElementById('currentTurn').textContent = 'Your Turn';
-                    document.getElementById('currentTurn').style.background = '#4caf50';
-                } else {
-                    document.getElementById('currentTurn').textContent = `${currentPlayer.name}'s Turn`;
-                    document.getElementById('currentTurn').style.background = '#ff9800';
+            if (!botHand || botHand.length === 0) return;
+
+            // Simple bot AI: play first valid card
+            for (const card of botHand) {
+                for (let row = 0; row < 10; row++) {
+                    for (let col = 0; col < 10; col++) {
+                        if (canPlaceCard(card, row, col, currentPlayer.team)) {
+                            // Bot plays this card
+                            const cell = sharedGameData.board[row][col];
+                            
+                            if (isJack(card)) {
+                                if (isOneEyedJack(card)) {
+                                    cell.occupied = false;
+                                    cell.team = null;
+                                } else {
+                                    cell.occupied = true;
+                                    cell.team = currentPlayer.team;
+                                }
+                            } else {
+                                cell.occupied = true;
+                                cell.team = currentPlayer.team;
+                            }
+
+                            // Remove card and draw new one
+                            const cardIndex = botHand.indexOf(card);
+                            botHand.splice(cardIndex, 1);
+                            
+                            if (sharedGameData.deck.length > 0) {
+                                botHand.push(sharedGameData.deck.pop());
+                            }
+
+                            checkSequences();
+                            sharedGameData.currentPlayerIndex = (sharedGameData.currentPlayerIndex + 1) % sharedGameData.players.length;
+                            
+                            saveSharedData();
+                            updateUI();
+                            updateGameStatus(`${currentPlayer.name} played ${card}`);
+                            
+                            // Chain bot turns
+                            setTimeout(() => {
+                                if (isCurrentPlayerBot()) {
+                                    playBotTurn();
+                                }
+                            }, 2000);
+                            
+                            return;
+                        }
+                    }
                 }
             }
-        }
-
-        function updateDebugInfo() {
-            // Update debug information displays
-            renderSessionInfo();
-        }
-
-        function updateGameStatus(message) {
-            document.getElementById('gameStatus').textContent = message;
-        }
-
-        function updateSyncIndicator(success) {
-            const indicator = document.getElementById('syncIndicator');
-            if (success) {
-                indicator.className = 'sync-indicator';
-            } else {
-                indicator.className = 'sync-indicator error';
+            
+            // If no valid moves, exchange first card
+            if (botHand.length > 0) {
+                const cardToExchange = botHand[0];
+                botHand.splice(0, 1);
+                
+                if (sharedGameData.deck.length > 0) {
+                    botHand.push(sharedGameData.deck.pop());
+                }
+                
+                sharedGameData.currentPlayerIndex = (sharedGameData.currentPlayerIndex + 1) % sharedGameData.players.length;
+                saveSharedData();
+                updateUI();
+                updateGameStatus(`${currentPlayer.name} exchanged a card`);
             }
         }
 
-        function isMyTurn() {
-            const session = multiplayerState[sessionId];
-            if (!session || !session.gameStarted) return false;
-            
-            const currentPlayer = session.players[session.currentPlayerIndex];
-            return currentPlayer && currentPlayer.id === userId;
+        // Update turn status
+        function updateTurnStatus() {
+            if (sharedGameData.gameOver) {
+                updateGameStatus(`🎉 Game Over! ${sharedGameData.winner} Wins! 🎉`);
+                return;
+            }
+
+            const currentPlayer = sharedGameData.players[sharedGameData.currentPlayerIndex];
+            if (!currentPlayer) return;
+
+            if (currentPlayer.id === gameState.playerId) {
+                updateGameStatus('Your turn! Select a card and place it on the board.');
+            } else {
+                updateGameStatus(`${currentPlayer.name}'s turn`);
+            }
         }
 
         // Helper functions
+        function isMyTurn() {
+            const currentPlayer = sharedGameData.players[sharedGameData.currentPlayerIndex];
+            return currentPlayer && currentPlayer.id === gameState.playerId && !sharedGameData.gameOver;
+        }
+
+        function isCurrentPlayerBot() {
+            const currentPlayer = sharedGameData.players[sharedGameData.currentPlayerIndex];
+            return currentPlayer && currentPlayer.isBot;
+        }
+
         function parseCard(card) {
             if (card === 'FREE') return ['FREE', ''];
             const suit = card.slice(-1);
@@ -1194,28 +1095,9 @@
             return card === 'J♠' || card === 'J♥';
         }
 
-        function isDeadCard(card) {
-            if (isJack(card)) return false;
-            
-            const positions = findCardPositions(card);
-            return positions.length > 0 && positions.every(([row, col]) => gameState.board[row][col].occupied);
-        }
-
-        function findCardPositions(card) {
-            const positions = [];
-            for (let row = 0; row < 10; row++) {
-                for (let col = 0; col < 10; col++) {
-                    if (gameState.board[row][col].card === card) {
-                        positions.push([row, col]);
-                    }
-                }
-            }
-            return positions;
-        }
-
-        function canPlaceCard(card, row, col) {
-            const cell = gameState.board[row][col];
-            const myTeam = gameState.players[gameState.myPlayerIndex]?.team;
+        function canPlaceCard(card, row, col, team = null) {
+            const cell = sharedGameData.board[row][col];
+            const myTeam = team || sharedGameData.players.find(p => p.id === gameState.playerId)?.team;
             
             if (isJack(card)) {
                 if (isOneEyedJack(card)) {
@@ -1228,19 +1110,33 @@
             }
         }
 
-        // Initialize game when page loads
+        function updateGameStatus(message) {
+            document.getElementById('gameStatus').textContent = message;
+        }
+
+        // Initialize on page load
         window.addEventListener('DOMContentLoaded', () => {
-            console.log('Sequence Game Loading...');
-            console.log('Session ID:', sessionId);
-            console.log('User ID:', userId);
-            console.log('Chat ID:', chatId);
+            console.log('Sequence Friends Game loaded');
             
-            initGame();
+            // Auto-fill player name from URL params if available
+            const urlParams = new URLSearchParams(window.location.search);
+            const userId = urlParams.get('user_id');
+            const userName = urlParams.get('user_name');
+            
+            if (userName) {
+                document.getElementById('playerNameInput').value = userName;
+            } else if (userId) {
+                document.getElementById('playerNameInput').value = `Player_${userId.slice(-4)}`;
+            }
+            
+            updateGameStatus('Ready to create or join a session with friends!');
         });
 
-        // Cleanup when page unloads
-        window.addEventListener('beforeunload', () => {
-            console.log('Game session ending for user:', userId);
+        // Handle page visibility for sync
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && gameState.connected) {
+                manualSync();
+            }
         });
     </script>
 </body>
